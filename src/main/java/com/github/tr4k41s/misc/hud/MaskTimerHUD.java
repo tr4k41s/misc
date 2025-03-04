@@ -3,7 +3,6 @@ package com.github.tr4k41s.misc.hud;
 import cc.polyfrost.oneconfig.hud.TextHud;
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import com.github.tr4k41s.misc.features.MaskTimers;
-import com.github.tr4k41s.misc.config.MiscConfig;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public class MaskTimerHUD extends TextHud {
 
     @Override
     protected void getLines(List<String> lines, boolean example) {
-        if (!MiscConfig.MaskTimers) return;
+        if (!isEnabled()) return;
 
         if (example) {
             lines.add("§bBonzo's Mask: §f4.90s");
