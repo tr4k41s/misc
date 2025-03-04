@@ -15,7 +15,6 @@ val mcVersion: String by project
 val version: String by project
 val mixinGroup = "$baseGroup.mixin"
 val modid: String by project
-val transformerFile = file("src/main/resources/accesstransformer.cfg")
 
 // Toolchains:
 java {
@@ -30,6 +29,7 @@ loom {
             // If you don't want mixins, remove these lines
             property("mixin.debug", "true")
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+            arg("--tweakClass", "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker")
         }
     }
     runConfigs {
@@ -45,10 +45,6 @@ loom {
         pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
         // If you don't want mixins, remove this lines
         mixinConfig("mixins.$modid.json")
-	    if (transformerFile.exists()) {
-			println("Installing access transformer")
-		    accessTransformer(transformerFile)
-	    }
     }
     // If you don't want mixins, remove these lines
     mixin {
@@ -67,6 +63,7 @@ repositories {
     maven("https://repo.spongepowered.org/maven/")
     // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+    maven("https://repo.polyfrost.cc/releases")
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -85,8 +82,10 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
 
     // If you don't want to log in with your real minecraft account, remove this line
-    runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
+    runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.2")
 
+    compileOnly("cc.polyfrost:oneconfig-1.8.9-forge:0.2.2-alpha+")
+    shadowImpl("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta+")
 }
 
 // Tasks:
@@ -95,7 +94,7 @@ tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
 }
 
-tasks.withType(org.gradle.jvm.tasks.Jar::class) {
+tasks.withType(Jar::class) {
     archiveBaseName.set(modid)
     manifest.attributes.run {
         this["FMLCorePluginContainsFMLMod"] = "true"
@@ -104,9 +103,13 @@ tasks.withType(org.gradle.jvm.tasks.Jar::class) {
         // If you don't want mixins, remove these lines
         this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
         this["MixinConfigs"] = "mixins.$modid.json"
-	    if (transformerFile.exists())
-			this["FMLAT"] = "${modid}_at.cfg"
     }
+    manifest.attributes += mapOf(
+        "ModSide" to "CLIENT",
+        "TweakOrder" to 0,
+        "ForceLoadAsMod" to true,
+        "TweakClass" to "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker"
+    )
 }
 
 tasks.processResources {
@@ -119,7 +122,7 @@ tasks.processResources {
         expand(inputs.properties)
     }
 
-    rename("accesstransformer.cfg", "META-INF/${modid}_at.cfg")
+    rename("(.+_at.cfg)", "META-INF/$1")
 }
 
 
@@ -131,16 +134,16 @@ val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
 
 tasks.jar {
     archiveClassifier.set("without-deps")
-    destinationDirectory.set(layout.buildDirectory.dir("intermediates"))
+    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
 
 tasks.shadowJar {
-    destinationDirectory.set(layout.buildDirectory.dir("intermediates"))
-    archiveClassifier.set("non-obfuscated-with-deps")
+    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
+    archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl)
     doLast {
         configurations.forEach {
-            println("Copying dependencies into mod: ${it.files}")
+            println("Copying jars into mod: ${it.files}")
         }
     }
 
@@ -149,4 +152,3 @@ tasks.shadowJar {
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)
-
