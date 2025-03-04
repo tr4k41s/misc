@@ -8,6 +8,7 @@ import com.github.tr4k41s.misc.utils.Utils;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -73,8 +74,8 @@ public class MaskTimers {
         }
 
     @SubscribeEvent
-    public void onPacketReceived(PacketEvent event) {
-        if (event.packet instanceof net.minecraft.network.play.server.S32PacketConfirmTransaction) {
+    public void onPacketReceived(PacketEvent.ReceiveEvent event) {
+        if (event.packet instanceof S32PacketConfirmTransaction) {
             String[] names = {"Bonzo's Mask", "Spirit Mask", "Phoenix Pet"};
             for (int i = 0; i < pop.length; i++) {
                 if (!popped[i] || pop[i]-- > 1) continue;
