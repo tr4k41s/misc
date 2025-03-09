@@ -2,14 +2,10 @@ package com.github.tr4k41s.misc.features.chat;
 
 import com.github.tr4k41s.misc.config.MiscConfig;
 import com.github.tr4k41s.misc.utils.ChatUtils;
-import net.minecraft.event.ClickEvent;
-import net.minecraft.event.HoverEvent;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import tv.twitch.chat.Chat;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -21,6 +17,7 @@ public class RemoveRanks {
     private static final List<Pattern> removeLevel = new ArrayList<>();
     private static final List<Pattern> removeText = new ArrayList<>();
     private boolean altered = false;
+    private final boolean mainToggle = (MiscConfig.removeRanks || MiscConfig.changePrefix || MiscConfig.removeLVL);
 
     static {
         rankReplace.put(Pattern.compile("(?:§.)*§.\\[VIP((?:§.)*\\+)?(?:§.)*]\\s"), "§r§a");
@@ -31,14 +28,14 @@ public class RemoveRanks {
         prefixReplace.put(Pattern.compile("^(?:§.)*§.Co-op\\s>"),"§r§b>");
         prefixReplace.put(Pattern.compile("^(?:§.)*§.Guild\\s>"),"§r§2>");
         prefixReplace.put(Pattern.compile("^(?:§.)*§.Friend\\s>"),"§r§a>");
-        removeLevel.add(Pattern.compile("^(?:§.)*§.\\[(?:§.)*§.\\d{1,3}(?:§.)*§.]\\s"));
+        removeLevel.add(Pattern.compile("(?:§.)*§.\\[(?:§.)*§.\\d{1,3}(?:§.)*§.]\\s"));
         removeText.add(Pattern.compile("has obtained (.+)?"));
         removeText.add(Pattern.compile("\\[(Tank|Mage|Archer|Healer|Berserk)]"));
         removeText.add(Pattern.compile("RIGHT CLICK on (a|the) .+ door to open it\\."));
         removeText.add(Pattern.compile("(Also )?granted you"));
         removeText.add(Pattern.compile("RARE DROP!( .+)?"));
         removeText.add(Pattern.compile("(A )?Blessing of .+( was picked up)?!"));
-        removeText.add(Pattern.compile("profile( ID)?:"));
+        removeText.add(Pattern.compile("Profile ID:.+"));
         removeText.add(Pattern.compile("They will be restored when"));
         removeText.add(Pattern.compile("is disabled here!"));
         removeText.add(Pattern.compile("Dragon's Breath on you!"));
@@ -92,6 +89,7 @@ public class RemoveRanks {
             return;
         }
 
+        if (!mainToggle) return;
         altered = false;
         final IChatComponent alteredComponent = processComponent(event.message, MiscConfig.removeRanks, MiscConfig.changePrefix, MiscConfig.removeLVL);
 
@@ -103,6 +101,22 @@ public class RemoveRanks {
 
 
     private IChatComponent processComponent(IChatComponent component, boolean removeRanks, boolean changePrefix, boolean removeLVL) {
+        if (!mainToggle) return component;
+        List<IChatComponent> newSiblings = new ArrayList<>();
+
+        for (IChatComponent sibling : component.getSiblings()) {
+            String siblingText = sibling.getUnformattedText().trim();
+            boolean isSkipped = MiscConfig.removeLVL && siblingText.equals("[") || siblingText.matches("^\\d+$") || siblingText.equals("]");
+
+            if (isSkipped) continue;
+
+            newSiblings.add(sibling);
+        }
+
+        component.getSiblings().clear();
+        component.getSiblings().addAll(newSiblings);
+
+
         IChatComponent textCopy = component.createCopy();
         textCopy.getSiblings().clear();
         final String originalText = textCopy.getFormattedText();
@@ -119,13 +133,13 @@ public class RemoveRanks {
             altered = true;
         }
 
-        List<IChatComponent> newSiblings = new ArrayList<>();
-        for (IChatComponent sibling : component.getSiblings()) {
-            newSiblings.add(processComponent(sibling, removeRanks, changePrefix, removeLVL));
+        List<IChatComponent> processedSiblings = new ArrayList<>();
+        for (IChatComponent sibling : newSiblings) {
+            processedSiblings.add(processComponent(sibling, removeRanks, changePrefix, removeLVL));
         }
 
         result.getSiblings().clear();
-        result.getSiblings().addAll(newSiblings);
+        result.getSiblings().addAll(processedSiblings);
 
         return result;
     }

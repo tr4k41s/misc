@@ -29,7 +29,7 @@ public class SimulateMessage extends CommandBase{
             final String message = String.join(" ", args).replaceAll("&", "§");
             ChatUtils.sendCleanMessage(new ChatComponentText(message));
         } catch (NumberFormatException e) {
-            ChatUtils.sendModMessage(new ChatComponentText("missing message"));
+            ChatUtils.sendModMessage("missing message");
             return;
         }
     }

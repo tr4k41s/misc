@@ -10,7 +10,6 @@ import com.github.tr4k41s.misc.utils.Utils;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S32PacketConfirmTransaction;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StringUtils;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -71,7 +70,7 @@ public class MaskTimers {
         for (int i = 0; i < pop.length; i++) {
             if (!popped[i] || pop[i]-- > 1) continue;
             popped[i] = false;
-            ChatUtils.sendModMessage(new ChatComponentText("§b" + names[i] + "§f is now available!"));
+            ChatUtils.sendModMessage("§b" + names[i] + "§f is now available!");
             if (MiscConfig.MaskTimerSoundToggle) { SoundUtils.playSound(new Vec3(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ), sound, MiscConfig.MaskTimerSoundVolume, MiscConfig.MaskTimerSoundPitch); }
         }
     }

@@ -9,7 +9,7 @@ import net.minecraftforge.common.MinecraftForge;
 import java.nio.charset.StandardCharsets;
 
 public class ChatUtils {
-    public static void sendModMessage(IChatComponent message) {
+    public static void sendModMessage(String message) {
         assert Minecraft.getMinecraft().thePlayer != null;
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("§8[§bm.sc§8] " + message));
     }
