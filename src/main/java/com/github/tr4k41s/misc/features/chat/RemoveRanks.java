@@ -30,6 +30,7 @@ public class RemoveRanks {
         prefixReplace.put(Pattern.compile("^(?:§.)*§.Party\\s(?:§.)*>"),"§r§9>");
         prefixReplace.put(Pattern.compile("^(?:§.)*§.Co-op\\s>"),"§r§b>");
         prefixReplace.put(Pattern.compile("^(?:§.)*§.Guild\\s>"),"§r§2>");
+        prefixReplace.put(Pattern.compile("^(?:§.)*§.Friend\\s>"),"§r§a>");
         removeLevel.add(Pattern.compile("^(?:§.)*§.\\[(?:§.)*§.\\d{1,3}(?:§.)*§.]\\s"));
         removeText.add(Pattern.compile("has obtained (.+)?"));
         removeText.add(Pattern.compile("\\[(Tank|Mage|Archer|Healer|Berserk)]"));
