@@ -21,8 +21,8 @@ public class RemoveRanks {
 
     static {
         rankReplace.put(Pattern.compile("(?:§.)*§.\\[VIP((?:§.)*\\+)?(?:§.)*]\\s"), "§r§a");
-        rankReplace.put(Pattern.compile("(?:§.)*§.\\[MVP((?:§.)*\\+)?(?:§.)*]\\s"), "§r§b");
-        rankReplace.put(Pattern.compile("(?:§.)*§.\\[MVP(?:§.)*\\+\\+(?:§.)*]\\s"), "§r§6");
+        rankReplace.put(Pattern.compile("(?:§.)*§.\\[MVP((?:§.)*§.\\+)?((?:§.)*§.)?]\\s"), "§r§b");
+        rankReplace.put(Pattern.compile("(?:§.)*§.\\[MVP(?:§.)*§.\\+\\+(?:§.)*§.]\\s"), "§r§6");
         rankReplace.put(Pattern.compile("(?:§.)*§.\\[(?:§.)*YOUTUBE(?:§.)*]\\s"), "§r§c");
         prefixReplace.put(Pattern.compile("^(?:§.)*§.Party\\s(?:§.)*>"),"§r§9>");
         prefixReplace.put(Pattern.compile("^(?:§.)*§.Co-op\\s>"),"§r§b>");
@@ -103,9 +103,11 @@ public class RemoveRanks {
         if (!mainToggle) return component;
         List<IChatComponent> newSiblings = new ArrayList<>();
 
+        boolean startsWithNumber = !component.getSiblings().isEmpty() && component.getSiblings().get(0).getUnformattedText().trim().matches("^\\d+.*");
+
         for (IChatComponent sibling : component.getSiblings()) {
             String siblingText = sibling.getUnformattedText().trim();
-            boolean isSkipped = MiscConfig.removeLVL && (siblingText.equals("[") || siblingText.matches("^\\d+$") || siblingText.equals("]"));
+            boolean isSkipped = !startsWithNumber && MiscConfig.removeLVL && (siblingText.equals("[") || siblingText.matches("^\\d+$") || siblingText.equals("]"));
 
             if (isSkipped) continue;
 

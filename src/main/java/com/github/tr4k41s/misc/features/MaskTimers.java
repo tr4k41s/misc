@@ -41,7 +41,7 @@ public class MaskTimers {
                 case "Your Bonzo's Mask saved your life!":
                 case "Your ⚚ Bonzo's Mask saved your life!":
                     head = mc.thePlayer.getCurrentArmor(3);
-                    if (head == null || head.getItem() != Items.skull) return;
+                    if (head == null || head.getItem() != Items.skull || !head.getDisplayName().contains("Spirit")) return;
                     for (String line : Utils.getItemLore(head)) {
                         String stripped = StringUtils.stripControlCodes(line);
                         if (!stripped.startsWith("Cooldown: ")) continue;
