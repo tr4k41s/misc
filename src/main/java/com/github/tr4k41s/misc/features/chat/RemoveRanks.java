@@ -105,7 +105,7 @@ public class RemoveRanks {
 
         for (IChatComponent sibling : component.getSiblings()) {
             String siblingText = sibling.getUnformattedText().trim();
-            boolean isSkipped = MiscConfig.removeLVL && siblingText.equals("[") || siblingText.matches("^\\d+$") || siblingText.equals("]");
+            boolean isSkipped = MiscConfig.removeLVL && (siblingText.equals("[") || siblingText.matches("^\\d+$") || siblingText.equals("]"));
 
             if (isSkipped) continue;
 
