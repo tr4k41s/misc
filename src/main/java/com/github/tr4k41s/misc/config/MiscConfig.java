@@ -60,6 +60,30 @@ public class MiscConfig extends Config{
     )
     public static float MaskTimerSoundPitch = 1f;
 
+    @Switch(
+            name = "Remove Hypixel ranks from chat",
+            category = "Chat Formatter"
+    )
+    public static boolean removeRanks = false;
+
+    @Switch(
+            name = "Shorten chat tab prefixes",
+            category = "Chat Formatter"
+    )
+    public static boolean changePrefix = false;
+
+    @Switch(
+            name = "Remove Skyblock Levels from chat (keeps the prefix emblem)",
+            category = "Chat Formatter"
+    )
+    public static boolean removeLVL = false;
+
+    @Switch(
+            name = "Remove chat spam",
+            category = "Chat Formatter"
+    )
+    public static boolean removeText = false;
+
     public MiscConfig() {
         super(new Mod("misc", ModType.SKYBLOCK), "misc.json");
         initialize();

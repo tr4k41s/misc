@@ -22,6 +22,12 @@ public class ScoreboardUtils {
      * @brief Condition Utilities
      */
 
+    /**
+     * @author pizza gril
+     * @version 2.0
+     * @brief Condition Utilities
+     */
+
     public static boolean inGame() {
         return (mc.thePlayer != null && mc.theWorld != null);
     }
